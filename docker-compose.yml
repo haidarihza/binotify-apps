@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  php-apache-environment:
+    container_name: php-apache
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    volumes:
+      - ./src/:/usr/src
+      - ./src/php.ini-production:/usr/local/etc/php/conf.d/php.ini-production
+    depends_on:
+      - db
+    ports:
+      - 8000:80
+  db:
+    container_name: db
+    image: mysql
+    volumes:
+      - ./db/data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: binotify
+      MYSQL_USER: MYSQL_USER
+      MYSQL_PASSWORD: MYSQL_PASSWORD
+    ports:
+      - 9906:3306
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8080:80
+    restart: always
+    environment:
+      - PHA_HOST= db
+      - UPLOAD_LIMIT= 640000000
+    depends_on:
+      - db
